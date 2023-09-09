@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { calculateNewPosition } from './utils';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { calculateNewPosition, IPosition, round } from './utils';
 
-interface IResult {
+interface IResult extends IPosition {
   label: string;
-  lat: number;
-  lng: number;
   dir: string;
   wind_dir?: number;
   wind?: number;
@@ -25,19 +23,16 @@ export class AppComponent implements OnInit {
   cap = undefined;
   speed = 5;
   hoursNumber = 24;
-  latDeg: number;
-  latMin: number;
-  latDir = 'N';
-  lonDeg: number;
-  lonMin: number;
-  lonDir = 'W';
+  lat;
+  lng;
   url1;
-  position;
+  position: IPosition;
+  newPosition: IPosition;
   message: string;
 
   resultList: IResult[];
 
-  isDev = true;
+  isDev = false;
 
   constructor( private http: HttpClient,
                private flash: MatSnackBar,
@@ -46,10 +41,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isDev) {
-      this.latDeg = 32;
-      this.latMin = 51;
-      this.lonDeg = 16;
-      this.lonMin = 52;
+      this.lat = 32.85;
+      this.lng = -16.867;
       this.cap = 180;
     }
     // const fn = (window as any).windyInit;
@@ -59,22 +52,20 @@ export class AppComponent implements OnInit {
   calculate(): void {
     const n = ( x ) => x === undefined || x === null;
     const rules = [
-      { error: n(this.latDeg), msg: `Vous devez définir la latitude en degrés` },
-      { error: n(this.latMin), msg: `Vous devez définir la latitude en minutes` },
-      { error: n(this.lonDeg), msg: `Vous devez définir la longitude en degrés` },
-      { error: n(this.lonMin), msg: `Vous devez définir la longitude en minutes` },
+      { error: n(this.lat), msg: `Vous devez définir la latitude en degrés` },
+      { error: n(this.lng), msg: `Vous devez définir la longitude en degrés` },
       { error: !this.cap, msg: `Vous devez définir le cap` },
     ];
     const errs = rules.filter(x => x.error);
     if (errs.length) {
-      alert(errs.map(x => x.msg).join(' , '));
+      this.flash.open(errs.map(x => x.msg).join(' , '), 'warn');
       return;
     }
-    const lat = (this.latDir === 'S' ? -1 : 1) * this.getPoint(this.latDeg, this.latMin);
-    const lng = (this.lonDir === 'W' ? -1 : 1) * this.getPoint(this.lonDeg, this.lonMin);
+    const lat = (this.lat);
+    const lng = (this.lng);
     this.position = { lat, lng };
     this.url1 = `https://www.windy.com/${lat}/${lng}`;
-    const pos = calculateNewPosition(lat, lng,
+    const pos = this.newPosition = calculateNewPosition(lat, lng,
       this.speed, this.cap, this.hoursNumber * 60 * 60);
     this.resultList = [
       ...this.getFourPoints('T0', lat, lng),
@@ -94,12 +85,16 @@ export class AppComponent implements OnInit {
                                            dir,
                                            wind_dir,
                                            wind, wave
-                                         } ) => `${dir}${wind}k${wind_dir || '290'}d${wave}`).join('');
+                                         } ) => `${dir}${wind || ''}k${wind_dir || ''}d${wave || ''}`).join('');
   }
 
   copyMessage( msg1, msg2 ): void {
-    this.clipboard.copy(msg1 + msg2);
+    const finalMsg = msg1 + msg2;
+    this.clipboard.copy(finalMsg);
     this.flash.open(`Le message a été copié !`, 'info');
+    if (finalMsg.length > 160) {
+      this.flash.open(`Attention le message fait plus de 160 caractères !`, 'warn');
+    }
   }
 
   getFourPoints( a, lat, lng ): { label, dir, lat, lng }[] {
@@ -109,10 +104,6 @@ export class AppComponent implements OnInit {
       { label: `Point Est ${a}`, dir: 'E', lat, lng: lng + 0.5 },
       { label: `Point Ouest ${a}`, dir: 'W', lat, lng: lng - 0.5 },
     ];
-  }
-
-  private getPoint( deg: number, minutes: number ): number {
-    return Math.round((deg + minutes / 60) * 1000) / 1000;
   }
 
   async test(): Promise<void> {

@@ -1,4 +1,25 @@
-export function calculateNewPosition( lat, lng, vitesse, cap, duree) {
+export interface IPosition {
+  lat: number;
+  lng: number;
+}
+
+export function round( value: number, rounded = 3 ): number {
+  const k = Math.pow(10, rounded);
+  return Math.round(value * k) / k;
+}
+
+export function countDecimal( n: number ): number {
+  if (n === null || Math.floor(n) === n) {
+    return 0;
+  } // No decimal places
+  const decimalPart = n.toString().split('.')[1];
+  if (!decimalPart) {
+    return 0;
+  } // No decimal places after the dot
+  return decimalPart.length;
+}
+
+export function calculateNewPosition( lat, lng, vitesse, cap, duree ): IPosition {
   // Rayon moyen de la Terre en mètres
   const R = 6371000;
 
@@ -30,5 +51,5 @@ export function calculateNewPosition( lat, lng, vitesse, cap, duree) {
   const newLat = (newLatRad * 180) / Math.PI;
   const newLng = (newLngRad * 180) / Math.PI;
 
-  return { lat: newLat, lng: newLng };
+  return { lat: round(newLat), lng: round(newLng) };
 }

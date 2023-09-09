@@ -11,12 +11,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule } from '@angular/material/input';
+import { InputGeolocComponent } from './input-geoloc/input-geoloc.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SafePipe,
-    WindyMapPluginComponent
+    WindyMapPluginComponent,
+    InputGeolocComponent
   ],
   imports: [
     BrowserModule,

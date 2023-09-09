@@ -2,29 +2,12 @@
   <li>
     Etape 1 : <a target="_blank" href="https://share.garmin.com/share/naos">Ouvrir la carte de Naos :
     https://share.garmin.com/share/naos</a>
-<!--    <button mat-raised-button color="primary" (click)="test()">Test récupération position</button>-->
+    <!--    <button mat-raised-button color="primary" (click)="test()">Test récupération position</button>-->
   </li>
   <li>
     Etape 2 : Saisir la position, le cap et la vitesse dans l'application
-
-    <div class="form-group">
-      <span class="lbl">Latitude</span>
-      <input type="number" [(ngModel)]="latDeg"> degrés
-      <input type="number" [(ngModel)]="latMin"> minutes
-      <select [(ngModel)]="latDir">
-        <option value="N">N</option>
-        <option value="S">S</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <span class="lbl">Longitude</span>
-      <input type="number" [(ngModel)]="lonDeg"> degrés
-      <input type="number" [(ngModel)]="lonMin"> minutes
-      <select [(ngModel)]="lonDir">
-        <option value="W">W</option>
-        <option value="E">E</option>
-      </select>
-    </div>
+    <app-input-geoloc placeholder="Latitude" type="lat" [(ngModel)]="lat"></app-input-geoloc>
+    <app-input-geoloc placeholder="Longitude" type="lng" [(ngModel)]="lng"></app-input-geoloc>
     <div class="form-group">
       <span class="lbl">Cap du bateau</span>
       <input type="number" placeholder="en degrés"
@@ -48,7 +31,12 @@
     <li>
       Etape 3 : Saisir les données météos windy
       <div>
-        <a [href]="url1" target="_blank">Position actuelle : {{position | json}}</a>
+        <a href="https://www.windy.com/{{position.lat}}/{{position.lng}}"
+           target="_blank">Position actuelle : {{position | json}}</a>
+      </div>
+      <div>
+        <a href="https://www.windy.com/{{newPosition.lat}}/{{newPosition.lng}}"
+           target="_blank">Nouvelle position : {{newPosition | json}}</a>
       </div>
       <table class="table table-bordered">
         <thead>
@@ -92,11 +80,13 @@
       <textarea #customMsg [maxlength]="160 - message.length"
                 placeholder="Message personnalisé : ( {{ 160 - message.length }} ) max"
                 rows="3"></textarea>
-      <p><u>Exemple</u> : ESE5A6 F SS07A8 T+24  = Est-SudEst Force 5 à 6 Forcissant Sud Sud Ouest 7 à 8 dans 24 Heures</p>
+      <p><u>Exemple</u> : ESE5A6 F SS07A8 T+24 = Est-SudEst Force 5 à 6 Forcissant Sud Sud Ouest 7 à 8 dans 24 Heures
+      </p>
       <p>F = Forcissant</p>
       <p>M = Molissant</p>
       <div>
-        <button mat-raised-button color="primary" (click)="copyMessage(message, customMsg.value)">Copier le message</button>
+        <button mat-raised-button color="primary" (click)="copyMessage(message, customMsg.value)">Copier le message
+        </button>
       </div>
     </li>
   </ng-container>

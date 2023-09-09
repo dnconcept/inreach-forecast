@@ -1,0 +1,13 @@
+<div>
+  <span class="lbl">{{placeholder}}</span>
+  <input type="number" [ngModel]="value"
+         (ngModelChange)="setValue($event)">
+</div>
+<div class="form-group" *ngIf="asCoord">
+  <span class="lbl">{{placeholder}} en ° minutes</span>
+  <input type="number" [ngModel]="deg" (ngModelChange)="setFromDegrees($event)"> degrés
+  <input type="number" [ngModel]="min" (ngModelChange)="setFromMinutes($event)"> minutes
+  <select [ngModel]="dir">
+    <option *ngFor="let d of directions; let i = index" [value]="i">{{d}}</option>
+  </select>
+</div>
