@@ -1,53 +1,103 @@
-<div>
-  <span class="lbl">Latitude</span>
-  <input type="number" [(ngModel)]="latDeg"> degrés
-  <input type="number" [(ngModel)]="latMin"> minutes
-  <select [(ngModel)]="latDir">
-    <option value="N">N</option>
-    <option value="S">S</option>
-  </select>
-</div>
-<div>
-  <span class="lbl">Longitude</span>
-  <input type="number" [(ngModel)]="lonDeg"> degrés
-  <input type="number" [(ngModel)]="lonMin"> minutes
-  <select [(ngModel)]="lonDir">
-    <option value="W">W</option>
-    <option value="E">E</option>
-  </select>
-</div>
-<div>
-  <span class="lbl">Cap</span> <input type="number" [(ngModel)]="cap"> degrés
-</div>
-<div>
-  <span class="lbl">Vitesse</span> <input type="number" [(ngModel)]="speed"> noeuds
-</div>
-<div>
-  <span class="lbl">Durée</span> <input type="number" disabled [(ngModel)]="hoursNumber"> Heures
-</div>
+<ol>
+  <li>
+    Etape 1 : <a target="_blank" href="https://share.garmin.com/share/naos">Ouvrir la carte de Naos :
+    https://share.garmin.com/share/naos</a>
+<!--    <button mat-raised-button color="primary" (click)="test()">Test récupération position</button>-->
+  </li>
+  <li>
+    Etape 2 : Saisir la position, le cap et la vitesse dans l'application
 
-<button (click)="calculate()">Calculer</button>
-
-<ng-container *ngIf="url1">
-  <div>
-    <a [href]="url1" target="_blank">Position actuelle : {{position | json}}</a>
-  </div>
-
-  <div *ngFor="let r of resultList">
-    <a class="lbl" [href]="'https://www.windy.com/' + r.lat + '/' + r.lng + '?d:picker'" target="_blank">{{r.label}}</a>
-    <input type="number" [(ngModel)]="r.wind" placeholder="Vent en noeuds">
-    <input type="number" [(ngModel)]="r.wind_dir" placeholder="Direction">
-    <input type="number" [(ngModel)]="r.wave" placeholder="Hauteur vague">
-  </div>
-  <div>
-    <button (click)="getMessage()">Calculer</button>
-    <div>
-      Message formatté : {{message}}
+    <div class="form-group">
+      <span class="lbl">Latitude</span>
+      <input type="number" [(ngModel)]="latDeg"> degrés
+      <input type="number" [(ngModel)]="latMin"> minutes
+      <select [(ngModel)]="latDir">
+        <option value="N">N</option>
+        <option value="S">S</option>
+      </select>
     </div>
-    <div>
-      Nombre de caractères : {{message?.length}}
+    <div class="form-group">
+      <span class="lbl">Longitude</span>
+      <input type="number" [(ngModel)]="lonDeg"> degrés
+      <input type="number" [(ngModel)]="lonMin"> minutes
+      <select [(ngModel)]="lonDir">
+        <option value="W">W</option>
+        <option value="E">E</option>
+      </select>
     </div>
-  </div>
-</ng-container>
-<!--<div id="windy"></div>-->
+    <div class="form-group">
+      <span class="lbl">Cap du bateau</span>
+      <input type="number" placeholder="en degrés"
+             [(ngModel)]="cap"> degrés
+    </div>
+    <div class="form-group">
+      <span class="lbl">Vitesse</span>
+      <input type="number" placeholder="Vitesse du bateau en noeuds"
+             [(ngModel)]="speed"> noeuds
+    </div>
+    <div class="form-group">
+      <span class="lbl">Durée</span>
+      <input type="number" placeholder="Durée en heure pour le prochain point"
+             [(ngModel)]="hoursNumber"> Heures
+    </div>
 
+    <button mat-raised-button color="primary" (click)="calculate()">Passer à l'étape 3</button>
+  </li>
+
+  <ng-container *ngIf="url1">
+    <li>
+      Etape 3 : Saisir les données météos windy
+      <div>
+        <a [href]="url1" target="_blank">Position actuelle : {{position | json}}</a>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>Point</th>
+          <th>Vent (kt)</th>
+          <th>Direction vent (°)</th>
+          <th>Hauteur vague (dm)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let r of resultList">
+          <td>
+            <a class="lbl" [href]="'https://www.windy.com/' + r.lat + '/' + r.lng + '?d:picker'"
+               target="_blank"><img src="https://www.windy.com/favicon.ico" alt="windy"> {{r.label}}</a>
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="r.wind" placeholder="en noeuds"> kt
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="r.wind_dir" placeholder="en degrés"> °
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="r.wave" placeholder="Hauteur vague"> dm
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div>
+        <button mat-raised-button color="primary" (click)="getMessage()">Passer à l'étape 4</button>
+      </div>
+    </li>
+    <li *ngIf="message">
+      Etape 4 : Envoi du message en répondant au message InReach reçu dans la boîte mail
+      <div>
+        Message formatté : {{message}}
+      </div>
+      <div>
+        Nombre de caractères : {{message?.length}}
+      </div>
+      <textarea #customMsg [maxlength]="160 - message.length"
+                placeholder="Message personnalisé : ( {{ 160 - message.length }} ) max"
+                rows="3"></textarea>
+      <p><u>Exemple</u> : ESE5A6 F SS07A8 T+24  = Est-SudEst Force 5 à 6 Forcissant Sud Sud Ouest 7 à 8 dans 24 Heures</p>
+      <p>F = Forcissant</p>
+      <p>M = Molissant</p>
+      <div>
+        <button mat-raised-button color="primary" (click)="copyMessage(message, customMsg.value)">Copier le message</button>
+      </div>
+    </li>
+  </ng-container>
+</ol>

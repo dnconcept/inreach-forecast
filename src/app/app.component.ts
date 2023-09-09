@@ -1,38 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import * as L from 'leaflet';
 import { calculateNewPosition } from './utils';
-
-const options = {
-  // Required: API key
-  key: 'RQPlybIeGqzCcaqo4HtLTP6CrriVSMpy',
-
-  // Put additional console output
-  // verbose: true,
-
-  // Optional: Initial state of the map
-  lat: 50.4,
-  lon: 14.3,
-  zoom: 5,
-  // overlay: 'ecmwfWaves',
-  // hasMoreLevels: true,
-  // favOverlays: [ 'wind', 'deg0', 'currents', 'radar', 'swell1' ], // 'ecmwfWaves', 'waves', 'temperature',
-  fav: [ "radar", "satellite", "wind", "gust", "rain", "rainAccu", "snowAccu", "thunder", "temp", "rh", "clouds", "lclouds", "cbase", "visibility", "waves", "swell1", "swell2", "sst", "no2", "gtco3", "aod550", "pm2p5" ],
-  latlon: false,
-  numDirection: true,
-};
-
-interface IWindyAPI {
-  map: L.Map;
-  picker;
-  utils;
-  store;
-  broadcast;
-}
-
-interface IPosition {
-  lat: number;
-  lng: number;
-}
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface IResult {
   label: string;
@@ -47,7 +17,7 @@ interface IResult {
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: [ './app.component.css' ]
+  styleUrls: [ './app.component.scss' ]
 })
 export class AppComponent implements OnInit {
 
@@ -55,34 +25,53 @@ export class AppComponent implements OnInit {
   cap = undefined;
   speed = 5;
   hoursNumber = 24;
-  lat = 45;
-  latDeg = 32;
-  latMin = 51;
+  latDeg: number;
+  latMin: number;
   latDir = 'N';
-  lonDeg = 16;
-  lonMin = 52;
+  lonDeg: number;
+  lonMin: number;
   lonDir = 'W';
-  lon = 12;
-  picker;
-  broadcast;
   url1;
   position;
   message: string;
 
   resultList: IResult[];
 
-  ngOnInit() {
+  isDev = true;
+
+  constructor( private http: HttpClient,
+               private flash: MatSnackBar,
+               private clipboard: Clipboard ) {
+  }
+
+  ngOnInit(): void {
+    if (this.isDev) {
+      this.latDeg = 32;
+      this.latMin = 51;
+      this.lonDeg = 16;
+      this.lonMin = 52;
+      this.cap = 180;
+    }
     // const fn = (window as any).windyInit;
     // fn(options, this.windyInit)
   }
 
-  calculate() {
-    if (!this.cap) {
-      alert(`Vous devez définir le cap`);
+  calculate(): void {
+    const n = ( x ) => x === undefined || x === null;
+    const rules = [
+      { error: n(this.latDeg), msg: `Vous devez définir la latitude en degrés` },
+      { error: n(this.latMin), msg: `Vous devez définir la latitude en minutes` },
+      { error: n(this.lonDeg), msg: `Vous devez définir la longitude en degrés` },
+      { error: n(this.lonMin), msg: `Vous devez définir la longitude en minutes` },
+      { error: !this.cap, msg: `Vous devez définir le cap` },
+    ];
+    const errs = rules.filter(x => x.error);
+    if (errs.length) {
+      alert(errs.map(x => x.msg).join(' , '));
       return;
     }
-    const lat = (this.latDir == 'S' ? -1 : 1) * this.getPoint(this.latDeg, this.latMin);
-    const lng = (this.lonDir == 'W' ? -1 : 1) * this.getPoint(this.lonDeg, this.lonMin);
+    const lat = (this.latDir === 'S' ? -1 : 1) * this.getPoint(this.latDeg, this.latMin);
+    const lng = (this.lonDir === 'W' ? -1 : 1) * this.getPoint(this.lonDeg, this.lonMin);
     this.position = { lat, lng };
     this.url1 = `https://www.windy.com/${lat}/${lng}`;
     const pos = calculateNewPosition(lat, lng,
@@ -91,23 +80,29 @@ export class AppComponent implements OnInit {
       ...this.getFourPoints('T0', lat, lng),
       ...this.getFourPoints(`T+${this.hoursNumber}H`, pos.lat, pos.lng),
     ];
-    for (const o of this.resultList) {
-      o.wind_dir = 290;
-      o.wind = 15;
-      o.wave = 12;
+    if (this.isDev) {
+      for (const o of this.resultList) {
+        o.wind_dir = 290;
+        o.wind = 15;
+        o.wave = 12;
+      }
     }
-    console.info('[AppComponent] calculate pos', pos);
   }
 
-  getMessage() {
+  getMessage(): void {
     this.message = this.resultList.map(( {
                                            dir,
                                            wind_dir,
                                            wind, wave
-    } ) => `${dir}${wind}D${wind_dir || '290'}V${wave}`).join('')
+                                         } ) => `${dir}${wind}k${wind_dir || '290'}d${wave}`).join('');
   }
 
-  getFourPoints( a, lat, lng ) {
+  copyMessage( msg1, msg2 ): void {
+    this.clipboard.copy(msg1 + msg2);
+    this.flash.open(`Le message a été copié !`, 'info');
+  }
+
+  getFourPoints( a, lat, lng ): { label, dir, lat, lng }[] {
     return [
       { label: `Point Nord ${a}`, dir: 'N', lat: lat + 0.5, lng },
       { label: `Point Sud ${a}`, dir: 'S', lat: lat - 0.5, lng },
@@ -116,74 +111,26 @@ export class AppComponent implements OnInit {
     ];
   }
 
-  go( lat, lon ) {
-    this.picker.open({ lat, lon });
-    this.broadcast.fire('rqstOpen', 'detail', { lat: 50, lon: 14 })
-  }
-
-  // Initialize Windy API
-  windyInit = ( windyAPI ) => {
-    console.info('[AppComponent] test a, b', windyAPI, this);
-    // windyAPI is ready, and contain 'map', 'store',
-    // 'picker' and other usefull stuff
-
-    const { map, picker, utils, store, broadcast } = windyAPI as IWindyAPI;
-    // .map is instance of Leaflet map
-    this.picker = picker;
-    this.broadcast = broadcast;
-    console.info('[AppComponent] windyInit picker', picker);
-
-    picker.on('pickerOpened', ( { lat, lon, values, overlay } ) => {
-      // -> 48.4, 14.3, [ U,V, ], 'wind'
-      console.log('opened', lat, lon, values, overlay);
-
-      const windObject = utils.wind2obj(values);
-      console.log(windObject);
-    });
-
-    picker.on('pickerMoved', ( { lat, lon, values, overlay } ) => {
-      // picker was dragged by user to latLon coords
-      console.log('moved', lat, lon, values, overlay);
-      this.lat = lat;
-      this.lon = lon;
-    });
-    // store.set('overlay', 'waves');
-
-    // Wait since weather is rendered
-    broadcast.once('redrawFinished', () => {
-      // Opening of a picker (async)
-      picker.open({ lat: 48.4, lon: 14.3 });
-    });
-
-
-    map.on('click', ( { latlng } ) => {
-      const { lat, lng } = latlng;
-      this.go(lat, lng);
-    });
-  }
-
-  store( store ) {
-    const levels = store.getAllowed('availLevels');
-    // levels = ['surface', '850h', ... ]
-    // Getting all available values for given key
-
-    let i = 0;
-    setInterval(() => {
-      i = i === levels.length - 1 ? 0 : i + 1;
-
-      // Changing Windy params at runtime
-      store.set('level', levels[i]);
-    }, 500);
-
-    // Observing change of .store value
-    store.on('level', level => {
-      console.log(`Level was changed: ${level}`);
-    });
-  }
-
-
-  private getPoint( deg: number, minutes: number ) {
+  private getPoint( deg: number, minutes: number ): number {
     return Math.round((deg + minutes / 60) * 1000) / 1000;
   }
 
+  async test(): Promise<void> {
+    const username = 'naos';
+    const password = 'naos';
+
+    // Combine username and password into a base64-encoded string
+    const credentials = btoa(`${username}:${password}`);
+    // Set up the headers with the Authorization header
+    const headers = new HttpHeaders({
+      Authorization: `Basic ${credentials}`
+    });
+    // Set the crossOrigin property to 'true' in the request options
+    const requestOptions = {
+      headers,
+      withCredentials: true, // This allows cookies and credentials to be sent in the request
+      crossOrigin: true, // This ensures the Referer header is sent
+    };
+    const r = await this.http.get(`https://share.garmin.com/Feed/Share/naos`, requestOptions).toPromise();
+  }
 }
