@@ -1,0 +1,24 @@
+RewriteEngine On
+#we replace domain.com/$1 with %{SERVER_NAME}%{REQUEST_URI}.
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule ^(.*) https://www.%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+
+RewriteRule ^(.*) /index.html [NC,L]
+
+#here we dont use www as non www was already redirected to www.
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*) https://%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+
+# Enforce no cache for index.html files in order to update front app js and css files !
+<Files index.html>
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </IfModule>
+</Files>
