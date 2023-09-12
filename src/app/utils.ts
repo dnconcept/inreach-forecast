@@ -19,12 +19,13 @@ export function countDecimal( n: number ): number {
   return decimalPart.length;
 }
 
-export function calculateNewPosition( lat, lng, vitesse, cap, duree ): IPosition {
+export function calculateNewPosition( lat: number, lng: number, speed: number,
+                                      cap: number, durationAsSecond: number ): IPosition {
   // Rayon moyen de la Terre en mètres
   const R = 6371000;
 
   // Convertir la vitesse en mètres par seconde
-  const vitesseMps = vitesse * 0.514444;
+  const vitesseMps = speed * 0.514444;
 
   // Convertir le cap en radians
   const capRad = (cap * Math.PI) / 180;
@@ -34,7 +35,7 @@ export function calculateNewPosition( lat, lng, vitesse, cap, duree ): IPosition
   const lngRad = (lng * Math.PI) / 180;
 
   // Calculer la distance parcourue en mètres
-  const distanceMeters = vitesseMps * duree;
+  const distanceMeters = vitesseMps * durationAsSecond;
 
   // Calculer la nouvelle latitude et la nouvelle longitude
   const newLatRad = Math.asin(

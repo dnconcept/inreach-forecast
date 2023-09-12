@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule } from '@angular/material/input';
 import { InputGeolocComponent } from './input-geoloc/input-geoloc.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { InputGeolocComponent } from './input-geoloc/input-geoloc.component';
     MatButtonModule,
     MatInputModule,
     HttpClientModule,
+    MatTooltipModule,
   ],
   providers: [],
   bootstrap: [ AppComponent ]

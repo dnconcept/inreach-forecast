@@ -9,6 +9,7 @@ interface IResult extends IPosition {
   dir: string;
   wind_dir?: number;
   wind?: number;
+  max_wind?: number;
   wave?: number;
 }
 
@@ -23,12 +24,15 @@ export class AppComponent implements OnInit {
   cap = undefined;
   speed = 5;
   hoursNumber = 24;
+  offsetMiles = 30;
   lat;
   lng;
   url1;
   position: IPosition;
   newPosition: IPosition;
   message: string;
+  customMsg = '';
+  maxChar = 160;
 
   resultList: IResult[];
 
@@ -41,12 +45,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isDev) {
-      this.lat = 32.85;
-      this.lng = -16.867;
+      this.lat = 49.327;
+      this.lng = -1.206;
       this.cap = 180;
     }
-    // const fn = (window as any).windyInit;
-    // fn(options, this.windyInit)
   }
 
   calculate(): void {
@@ -67,9 +69,11 @@ export class AppComponent implements OnInit {
     this.url1 = `https://www.windy.com/${lat}/${lng}`;
     const pos = this.newPosition = calculateNewPosition(lat, lng,
       this.speed, this.cap, this.hoursNumber * 60 * 60);
+    const offset = this.offsetMiles / 60;
     this.resultList = [
-      ...this.getFourPoints('T0', lat, lng),
-      ...this.getFourPoints(`T+${this.hoursNumber}H`, pos.lat, pos.lng),
+      ...this.getFourPoints('T0', lat, lng, offset),
+      { label: `Point estimé T+${this.hoursNumber}H`, dir: 'X', lat: pos.lat, lng: pos.lng },
+      ...this.getFourPoints(`T+${this.hoursNumber}H`, pos.lat, pos.lng, offset),
     ];
     if (this.isDev) {
       for (const o of this.resultList) {
@@ -81,11 +85,17 @@ export class AppComponent implements OnInit {
   }
 
   getMessage(): void {
-    this.message = this.resultList.map(( {
-                                           dir,
-                                           wind_dir,
-                                           wind, wave
-                                         } ) => `${dir}${wind || ''}k${wind_dir || ''}d${wave || ''}`).join('');
+    const msg = this.resultList.map(( {
+                                        dir,
+                                        wind_dir,
+                                        wind, wave
+                                      } ) => `${dir}${wind || ''}k${wind_dir || ''}d${wave || ''}`).join('');
+    const a = this.resultList
+      .filter(( { wind, max_wind } ) => wind && max_wind)
+      .map(( { wind, max_wind } ) => max_wind / wind);
+    const max = a.length ? round((Math.max.apply(null, a) - 1) * 100, 0) : 0;
+    const raf = max > 0 ? `r${max}` : '';
+    this.message = msg + `Fs${this.speed}c${this.cap}h${this.hoursNumber}${raf}F`;
   }
 
   copyMessage( msg1, msg2 ): void {
@@ -97,12 +107,14 @@ export class AppComponent implements OnInit {
     }
   }
 
-  getFourPoints( a, lat, lng ): { label, dir, lat, lng }[] {
+  getFourPoints( name: string, lat: number, lng: number, offset: number ): { label, dir, lat, lng }[] {
+    // Conversion de miles nautiques en degrés de longitude à la latitude donnée
+    const coeff = Math.cos((lat * Math.PI) / 180);
     return [
-      { label: `Point Nord ${a}`, dir: 'N', lat: lat + 0.5, lng },
-      { label: `Point Sud ${a}`, dir: 'S', lat: lat - 0.5, lng },
-      { label: `Point Est ${a}`, dir: 'E', lat, lng: lng + 0.5 },
-      { label: `Point Ouest ${a}`, dir: 'W', lat, lng: lng - 0.5 },
+      { label: `Point Nord ${name}`, dir: 'N', lat: lat + offset, lng },
+      { label: `Point Sud ${name}`, dir: 'S', lat: lat - offset, lng },
+      { label: `Point Est ${name}`, dir: 'E', lat, lng: lng + offset / coeff },
+      { label: `Point Ouest ${name}`, dir: 'W', lat, lng: lng - offset / coeff },
     ];
   }
 
