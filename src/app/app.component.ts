@@ -92,9 +92,9 @@ export class AppComponent implements OnInit {
                                       } ) => `${dir}${wind || ''}k${wind_dir || ''}d${wave || ''}`).join('');
     const a = this.resultList
       .filter(( { wind, max_wind } ) => wind && max_wind)
-      .map(( { wind, max_wind } ) => max_wind / wind);
+      .map(( { wind, max_wind } ) => Number(max_wind) / Number(wind));
     const max = a.length ? round((Math.max.apply(null, a) - 1) * 100, 0) : 0;
-    const raf = max > 0 ? `r${max}` : '';
+    const raf = max > 0 ? `r${max}` : 'r0';
     this.message = msg + `Fs${this.speed}c${this.cap}h${this.hoursNumber}${raf}F`;
   }
 
