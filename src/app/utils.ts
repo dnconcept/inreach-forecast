@@ -12,7 +12,7 @@ export function countDecimal( n: number ): number {
   if (n === null || Math.floor(n) === n) {
     return 0;
   } // No decimal places
-  const decimalPart = n.toString().split('.')[1];
+  const decimalPart = n.toString().split('.')[ 1 ];
   if (!decimalPart) {
     return 0;
   } // No decimal places after the dot

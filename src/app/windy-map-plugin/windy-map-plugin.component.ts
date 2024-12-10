@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+// @ts-ignore:next-line
 import * as L from 'leaflet';
 
 const options = {
@@ -22,10 +23,17 @@ const options = {
 
 interface IWindyAPI {
   map: L.Map;
-  picker;
-  utils;
-  store;
-  broadcast;
+  picker: any;
+  utils: any;
+  store: any;
+  broadcast: any;
+}
+
+interface IWindyEvent {
+  lat: number,
+  lon: number,
+  values: any,
+  overlay: any
 }
 
 interface IPosition {
@@ -36,28 +44,29 @@ interface IPosition {
 @Component({
   selector: 'app-windy-map-plugin',
   templateUrl: './windy-map-plugin.component.html',
-  styleUrls: ['./windy-map-plugin.component.css']
+  styleUrl: './windy-map-plugin.component.css',
+  standalone: true,
 })
 export class WindyMapPluginComponent {
 
-  picker;
-  broadcast;
+  picker: any;
+  broadcast: any;
   lat = 45;
   lon = 12;
 
   // Initialize Windy API
-  windyInit = ( windyAPI ) => {
+  windyInit = ( windyAPI: IWindyAPI ) => {
     console.info('[AppComponent] test a, b', windyAPI, this);
     // windyAPI is ready, and contain 'map', 'store',
     // 'picker' and other usefull stuff
 
-    const { map, picker, utils, store, broadcast } = windyAPI as IWindyAPI;
+    const { map, picker, utils, store, broadcast } = windyAPI;
     // .map is instance of Leaflet map
     this.picker = picker;
     this.broadcast = broadcast;
     console.info('[AppComponent] windyInit picker', picker);
 
-    picker.on('pickerOpened', ( { lat, lon, values, overlay } ) => {
+    picker.on('pickerOpened', ( { lat, lon, values, overlay }: IWindyEvent ) => {
       // -> 48.4, 14.3, [ U,V, ], 'wind'
       console.log('opened', lat, lon, values, overlay);
 
@@ -65,7 +74,7 @@ export class WindyMapPluginComponent {
       console.log(windObject);
     });
 
-    picker.on('pickerMoved', ( { lat, lon, values, overlay } ) => {
+    picker.on('pickerMoved', ( { lat, lon, values, overlay }: IWindyEvent ) => {
       // picker was dragged by user to latLon coords
       console.log('moved', lat, lon, values, overlay);
       this.lat = lat;
@@ -80,18 +89,18 @@ export class WindyMapPluginComponent {
     });
 
 
-    map.on('click', ( { latlng } ) => {
+    map.on('click', ( { latlng }: { latlng: IPosition } ) => {
       const { lat, lng } = latlng;
       this.go(lat, lng);
     });
   }
 
-  go( lat, lon ): void {
+  go( lat: number, lon: number ): void {
     this.picker.open({ lat, lon });
     this.broadcast.fire('rqstOpen', 'detail', { lat: 50, lon: 14 });
   }
 
-  store( store ): void {
+  store( store: any ): void {
     const levels = store.getAllowed('availLevels');
     // levels = ['surface', '850h', ... ]
     // Getting all available values for given key
@@ -101,11 +110,11 @@ export class WindyMapPluginComponent {
       i = i === levels.length - 1 ? 0 : i + 1;
 
       // Changing Windy params at runtime
-      store.set('level', levels[i]);
+      store.set('level', levels[ i ]);
     }, 500);
 
     // Observing change of .store value
-    store.on('level', level => {
+    store.on('level', ( level: any ) => {
       console.log(`Level was changed: ${level}`);
     });
   }

@@ -1,30 +1,36 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppInputBase } from '../app-input-base.directive';
 import { round } from '../utils';
+import { NgForOf, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-input-geoloc',
   templateUrl: './input-geoloc.component.html',
-  styleUrls: [ './input-geoloc.component.css' ],
+  styleUrl: './input-geoloc.component.css',
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputGeolocComponent), multi: true },
+  ],
+  standalone: true,
+  imports: [
+    NgIf,
+    FormsModule,
+    NgForOf
   ]
 })
 export class InputGeolocComponent extends AppInputBase implements OnInit {
-  @Input() placeholder;
-  @Input() type: 'lat' | 'lng';
+  @Input() type?: 'lat' | 'lng';
   asCoord = true;
-  deg;
-  min;
+  deg: number;
+  min: number;
   dir: 0 | 1;
-  directions;
+  directions: string[];
 
   ngOnInit(): void {
     this.directions = this.type === 'lat' ? [ 'N', 'S' ] : [ 'E', 'W' ];
   }
 
-  protected onWriteValue( value: number ): void {
+  protected override onWriteValue( value: number ): void {
     if (this.type === 'lat') {
       this.dir = value > 0 ? 0 : 1;
     } else {
@@ -37,18 +43,18 @@ export class InputGeolocComponent extends AppInputBase implements OnInit {
     this.min = Math.abs(round((value - ints) * 0.60, decimals) * Math.pow(10, decimals));
   }
 
-  setValue( v ): void {
+  setValue( v: number ): void {
     this.value = v;
   }
 
-  setFromDegrees( deg ): void {
+  setFromDegrees( deg: number ): void {
     const oldValue = this.innerValue;
     this.deg = deg;
     const value = this.innerValue = (this.dir === 0 ? 1 : -1) * round(deg + this.min / 60);
     this.emitChange(oldValue, value);
   }
 
-  setFromMinutes( minutes ): void {
+  setFromMinutes( minutes: number ): void {
     const oldValue = this.innerValue;
     this.min = minutes;
     const value = this.innerValue = (this.dir === 0 ? 1 : -1) * round(this.deg + minutes / 60);

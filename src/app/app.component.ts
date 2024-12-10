@@ -3,6 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { calculateNewPosition, IPosition, round } from './utils';
+import { JsonPipe, NgForOf, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { InputGeolocComponent } from './input-geoloc/input-geoloc.component';
+import { MatButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 
 interface IResult extends IPosition {
   label: string;
@@ -15,22 +20,24 @@ interface IResult extends IPosition {
 
 @Component({
   selector: 'app-root',
+  imports: [ NgIf, FormsModule, InputGeolocComponent, JsonPipe, MatButton, MatTooltip, NgForOf ],
   templateUrl: './app.component.html',
-  styleUrls: [ './app.component.scss' ]
+  styleUrl: './app.component.scss',
+  standalone: true,
 })
 export class AppComponent implements OnInit {
 
   title = 'windy-routing';
-  cap = undefined;
+  cap: number;
   speed = 5;
   hoursNumber = 24;
   offsetMiles = 30;
-  lat;
-  lng;
-  url1;
+  lat: number;
+  lng: number;
+  url1: string;
   position: IPosition;
   newPosition: IPosition;
-  message: string;
+  message?: string;
   customMsg = '';
   maxChar = 160;
 
@@ -52,7 +59,7 @@ export class AppComponent implements OnInit {
   }
 
   calculate(): void {
-    const n = ( x ) => x === undefined || x === null;
+    const n = ( x: any ) => x === undefined || x === null;
     const rules = [
       { error: n(this.lat), msg: `Vous devez définir la latitude en degrés` },
       { error: n(this.lng), msg: `Vous devez définir la longitude en degrés` },
@@ -63,12 +70,12 @@ export class AppComponent implements OnInit {
       this.flash.open(errs.map(x => x.msg).join(' , '), 'warn');
       return;
     }
-    const lat = (this.lat);
-    const lng = (this.lng);
+    const lat = this.lat!;
+    const lng = this.lng!;
     this.position = { lat, lng };
     this.url1 = `https://www.windy.com/${lat}/${lng}`;
-    const pos = this.newPosition = calculateNewPosition(lat, lng,
-      this.speed, this.cap, this.hoursNumber * 60 * 60);
+    const pos = this.newPosition = calculateNewPosition(lat!, lng!,
+      this.speed, this.cap!, this.hoursNumber * 60 * 60);
     const offset = this.offsetMiles / 60;
     this.resultList = [
       ...this.getFourPoints('T0', lat, lng, offset),
@@ -98,7 +105,7 @@ export class AppComponent implements OnInit {
     this.message = msg + `Fs${this.speed}c${this.cap}h${this.hoursNumber}${raf}F`;
   }
 
-  copyMessage( msg1, msg2 ): void {
+  copyMessage( msg1: string, msg2: string ): void {
     const finalMsg = msg1 + msg2;
     this.clipboard.copy(finalMsg);
     this.flash.open(`Le message a été copié !`, 'info');
@@ -107,7 +114,9 @@ export class AppComponent implements OnInit {
     }
   }
 
-  getFourPoints( name: string, lat: number, lng: number, offset: number ): { label, dir, lat, lng }[] {
+  getFourPoints( name: string, lat: number, lng: number, offset: number ): {
+    label: string, dir: string, lat: number, lng: number
+  }[] {
     // Conversion de miles nautiques en degrés de longitude à la latitude donnée
     const coeff = Math.cos((lat * Math.PI) / 180);
     return [

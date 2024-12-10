@@ -29,7 +29,7 @@ export abstract class AppInputBase<T = any> implements ControlValueAccessor {
     this.emitChange(oldValue, value);
   }
 
-  protected emitChange( oldValue, value ) {
+  protected emitChange( oldValue: T, value: T ) {
     if (oldValue !== value) {
       this.onChangedList.forEach(x => x(this.innerValue));
       this.change.emit(this.innerValue);
