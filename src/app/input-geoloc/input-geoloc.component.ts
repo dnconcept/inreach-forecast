@@ -39,7 +39,7 @@ export class InputGeolocComponent extends AppInputBase implements OnInit {
     const ints = Math.trunc(value);
     this.deg = Math.abs(ints);
     const decimals = 2; // countDecimal(value);
-    // console.info('[InputGeolocComponent] onWriteValue decimals', decimals, value);
+    console.info('[InputGeolocComponent] onWriteValue decimals', decimals, this.dir);
     this.min = Math.abs(round((value - ints) * 0.60, decimals) * Math.pow(10, decimals));
   }
 

@@ -5,8 +5,8 @@
 </div>
 <div class="form-group" *ngIf="asCoord">
   <span class="lbl">{{placeholder}} en ° minutes</span>
-  <input type="number" [ngModel]="deg" (ngModelChange)="setFromDegrees($event)"> degrés
-  <input type="number" [ngModel]="min" (ngModelChange)="setFromMinutes($event)"> minutes
+  <input type="number" [ngModel]="deg" (ngModelChange)="setFromDegrees($event)"> °
+  <input type="number" [ngModel]="min" (ngModelChange)="setFromMinutes($event)"> '
   <select [ngModel]="dir">
     <option *ngFor="let d of directions; let i = index" [value]="i">{{d}}</option>
   </select>

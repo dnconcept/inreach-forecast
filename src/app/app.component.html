@@ -6,49 +6,50 @@
   </li>
   <li>
     Etape 2 : Saisir la position, le cap et la vitesse dans l'application
-    <app-input-geoloc placeholder="Latitude" type="lat" [(ngModel)]="lat"></app-input-geoloc>
-    <app-input-geoloc placeholder="Longitude" type="lng" [(ngModel)]="lng"></app-input-geoloc>
-    <div class="form-group">
-      <span class="lbl">Cap du bateau</span>
-      <input type="number" placeholder="en degrés"
-             [(ngModel)]="cap"> degrés
-    </div>
-    <div class="form-group">
-      <span class="lbl">Vitesse</span>
-      <input type="number" placeholder="Vitesse du bateau en noeuds"
-             [(ngModel)]="speed"> noeuds
-    </div>
-    <div class="form-group">
-      <span class="lbl">Durée</span>
-      <input type="number" placeholder="Durée en heure pour le prochain point"
-             [(ngModel)]="hoursNumber"> Heures
-    </div>
-    <div class="form-group">
-      <span class="lbl">Décalage en milles</span>
-      <input type="number" disabled placeholder="Nombre de milles de décalage"
-             [(ngModel)]="offsetMiles"> milles
-    </div>
-
-    <button mat-raised-button color="primary" (click)="calculate()">Passer à l'étape 3</button>
+    <form #ngForm="ngForm">
+      <app-input-geoloc placeholder="Latitude" type="lat" required ngModel name="lat"></app-input-geoloc>
+      <app-input-geoloc placeholder="Longitude" type="lng" required ngModel name="lng"></app-input-geoloc>
+      <div class="form-group">
+        <span class="lbl">Cap du bateau</span>
+        <input type="number" placeholder="en degrés" ngModel name="cap"> degrés
+      </div>
+      <div class="form-group">
+        <span class="lbl">Vitesse</span>
+        <input type="number" placeholder="Vitesse du bateau en noeuds"
+               ngModel name="speed"> noeuds
+      </div>
+      <div class="form-group">
+        <span class="lbl">Durée</span>
+        <input type="number" placeholder="Durée en heure pour le prochain point"
+               ngModel name="hoursNumber"> Heures
+      </div>
+      <div class="form-group">
+        <span class="lbl">Décalage en milles</span>
+        <input type="number" disabled placeholder="Nombre de milles de décalage"
+               ngModel name="offsetMiles"> milles
+      </div>
+    </form>
   </li>
-
   <ng-container *ngIf="url1">
     <li>
       Etape 3 : Saisir les données météos windy
       <div>
         <a href="https://www.windy.com/{{position.lat}}/{{position.lng}}"
-           target="_blank">Position actuelle : {{position | json}}</a>
+           target="_blank">Position actuelle : {{ position | json }}</a>
       </div>
       <div>
         <a href="https://www.windy.com/{{newPosition.lat}}/{{newPosition.lng}}"
-           target="_blank">Nouvelle position : {{newPosition | json}}</a>
+           target="_blank">Nouvelle position : {{ newPosition | json }}</a>
       </div>
       <table class="table table-bordered">
         <thead>
         <tr>
           <th>Point</th>
           <th>Vent * (kt)</th>
-          <th matTooltip="Les rafales sont utilisées pour donner une information du maximum de différence en % sur l'ensemble des points">Rafale (kt)</th>
+          <th
+            matTooltip="Les rafales sont utilisées pour donner une information du maximum de différence en % sur l'ensemble des points">
+            Rafale (kt)
+          </th>
           <th>Direction vent * (°)</th>
           <th>Hauteur vague * (dm)</th>
         </tr>
@@ -57,7 +58,7 @@
         <tr *ngFor="let r of resultList">
           <td>
             <a class="lbl" [href]="'https://www.windy.com/' + r.lat + '/' + r.lng + '?d:picker'"
-               target="_blank"><img src="https://www.windy.com/favicon.ico" alt="windy"> {{r.label}}</a>
+               target="_blank"><img src="https://www.windy.com/favicon.ico" alt="windy"> {{ r.label }}</a>
           </td>
           <td>
             <input type="number" [(ngModel)]="r.wind" placeholder="en noeuds"> kt
@@ -75,41 +76,41 @@
         </tbody>
       </table>
       <div>
-        <button mat-raised-button color="primary" (click)="getMessage()">Passer à l'étape 4</button>
+        <button mat-raised-button color="primary" (click)="getMessage(ngForm.value)">Passer à l'étape 4</button>
       </div>
     </li>
     <li *ngIf="message">
       Etape 4 : Envoi du message en répondant au message InReach reçu dans la boîte mail
       <div>
-        Message formatté : {{message}}
+        Message formatté : {{ message }}
       </div>
       <div>
-        Nombre de caractères météo : {{message.length}}
+        Nombre de caractères météo : {{ message.length }}
       </div>
       <textarea [maxlength]="maxChar - message.length"
                 [(ngModel)]="customMsg"
                 placeholder="Message personnalisé : ( {{ maxChar - message.length }} ) max"
                 rows="3"></textarea>
       <div>
-        Nombre de caractères personnalisés : {{customMsg.length}}
+        Nombre de caractères personnalisés : {{ customMsg.length }}
       </div>
       <div>
-        Total caractères : {{customMsg.length + message.length}}
+        Total caractères : {{ customMsg.length + message.length }}
       </div>
       <p><u>Exemple</u> : ESE5A6 F SS07A8 T+24 = Est-SudEst Force 5 à 6 Forcissant Sud Sud Ouest 7 à 8 dans 24 Heures
       </p>
       <p>Glossaire pour message raccourci</p>
-      <p>F = Forcissant</p>
-      <p>M = Molissant</p>
-      <p>D = Dépression</p>
-      <p>A = Anticyclone</p>
-      <p>N = Nord</p>
-      <p>S = Sud</p>
-      <p>E = Est</p>
-      <p>W = Ouest</p>
-      <p>MerF = Mer forte</p>
-      <p>MerTF = Mer très forte</p>
-      <p>MerG = Mer grosse</p>
+      <div>F = Forcissant</div>
+      <div>M = Molissant</div>
+      <div>D = Dépression</div>
+      <div>A = Anticyclone</div>
+      <div>N = Nord</div>
+      <div>S = Sud</div>
+      <div>E = Est</div>
+      <div>W = Ouest</div>
+      <div>MerF = Mer forte</div>
+      <div>MerTF = Mer très forte</div>
+      <div>MerG = Mer grosse</div>
       <div>
         <button mat-raised-button color="primary"
                 (click)="copyMessage(message, customMsg)">Copier le message

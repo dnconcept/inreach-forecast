@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { calculateNewPosition, IPosition, round } from './utils';
 import { JsonPipe, NgForOf, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { InputGeolocComponent } from './input-geoloc/input-geoloc.component';
 import { MatButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -18,6 +18,15 @@ interface IResult extends IPosition {
   wave?: number;
 }
 
+interface IFormValue {
+  lat: number,
+  lng: number,
+  cap: number,
+  speed: number,
+  hoursNumber: number,
+  offsetMiles: number,
+}
+
 @Component({
   selector: 'app-root',
   imports: [ NgIf, FormsModule, InputGeolocComponent, JsonPipe, MatButton, MatTooltip, NgForOf ],
@@ -25,73 +34,63 @@ interface IResult extends IPosition {
   styleUrl: './app.component.scss',
   standalone: true,
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements AfterViewInit {
 
   title = 'windy-routing';
-  cap: number;
-  speed = 5;
-  hoursNumber = 24;
-  offsetMiles = 30;
-  lat: number;
-  lng: number;
   url1: string;
   position: IPosition;
   newPosition: IPosition;
   message?: string;
   customMsg = '';
   maxChar = 160;
-
+  errorList: { error: boolean, msg: string }[];
   resultList: IResult[];
-
-  isDev = false;
+  @ViewChild(NgForm) ngForm: NgForm;
 
   constructor( private http: HttpClient,
                private flash: MatSnackBar,
                private clipboard: Clipboard ) {
   }
 
-  ngOnInit(): void {
-    if (this.isDev) {
-      this.lat = 49.327;
-      this.lng = -1.206;
-      this.cap = 180;
-    }
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.ngForm.control.patchValue({
+        speed: 5,
+        hoursNumber: 24,
+        offsetMiles: 30,
+      })
+      this.ngForm.valueChanges?.subscribe(x => this.calculate(x));
+    });
   }
 
-  calculate(): void {
+  calculate( formValue: IFormValue ): void {
+    const lat = formValue.lat!;
+    const lng = formValue.lng!;
     const n = ( x: any ) => x === undefined || x === null;
     const rules = [
-      { error: n(this.lat), msg: `Vous devez définir la latitude en degrés` },
-      { error: n(this.lng), msg: `Vous devez définir la longitude en degrés` },
-      { error: !this.cap, msg: `Vous devez définir le cap` },
+      { error: n(lat), msg: `Vous devez définir la latitude en degrés` },
+      { error: n(lng), msg: `Vous devez définir la longitude en degrés` },
+      { error: !formValue.cap, msg: `Vous devez définir le cap` },
     ];
     const errs = rules.filter(x => x.error);
+    this.errorList = errs;
     if (errs.length) {
-      this.flash.open(errs.map(x => x.msg).join(' , '), 'warn');
       return;
     }
-    const lat = this.lat!;
-    const lng = this.lng!;
     this.position = { lat, lng };
     this.url1 = `https://www.windy.com/${lat}/${lng}`;
+    const { speed, hoursNumber, offsetMiles } = formValue;
     const pos = this.newPosition = calculateNewPosition(lat!, lng!,
-      this.speed, this.cap!, this.hoursNumber * 60 * 60);
-    const offset = this.offsetMiles / 60;
+      speed, formValue.cap!, hoursNumber * 60 * 60);
+    const offset = offsetMiles / 60;
     this.resultList = [
       ...this.getFourPoints('T0', lat, lng, offset),
-      { label: `Point estimé T+${this.hoursNumber}H`, dir: 'X', lat: pos.lat, lng: pos.lng },
-      ...this.getFourPoints(`T+${this.hoursNumber}H`, pos.lat, pos.lng, offset),
+      { label: `Point estimé T+${hoursNumber}H`, dir: 'X', lat: pos.lat, lng: pos.lng },
+      ...this.getFourPoints(`T+${hoursNumber}H`, pos.lat, pos.lng, offset),
     ];
-    if (this.isDev) {
-      for (const o of this.resultList) {
-        o.wind_dir = 290;
-        o.wind = 15;
-        o.wave = 12;
-      }
-    }
   }
 
-  getMessage(): void {
+  getMessage( { speed, cap, hoursNumber }: IFormValue ): void {
     const msg = this.resultList.map(( {
                                         dir,
                                         wind_dir,
@@ -102,7 +101,7 @@ export class AppComponent implements OnInit {
       .map(( { wind, max_wind } ) => Number(max_wind) / Number(wind));
     const max = a.length ? round((Math.max.apply(null, a) - 1) * 100, 0) : 0;
     const raf = max > 0 ? `r${max}` : 'r0';
-    this.message = msg + `Fs${this.speed}c${this.cap}h${this.hoursNumber}${raf}F`;
+    this.message = msg + `Fs${speed}c${cap}h${hoursNumber}${raf}F`;
   }
 
   copyMessage( msg1: string, msg2: string ): void {
@@ -143,6 +142,7 @@ export class AppComponent implements OnInit {
       withCredentials: true, // This allows cookies and credentials to be sent in the request
       crossOrigin: true, // This ensures the Referer header is sent
     };
-    const r = await this.http.get(`https://share.garmin.com/Feed/Share/naos`, requestOptions).toPromise();
+    const result = await this.http.get(`https://share.garmin.com/Feed/Share/naos`, requestOptions).toPromise();
+    console.info('[AppComponent] test ', result);
   }
 }

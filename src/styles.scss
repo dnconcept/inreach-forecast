@@ -22,6 +22,10 @@ input, textarea {
   }
 }
 
+input[type="number"] {
+  max-width: 60px;
+}
+
 textarea {
   width: 100%;
 }
