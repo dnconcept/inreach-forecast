@@ -1,0 +1,7 @@
+<div class="menu">
+  <div [routerLink]="['windy']" [relativeTo]="route" routerLinkActive="active">Windy page</div>
+  <div [routerLink]="['grib']" [relativeTo]="route" routerLinkActive="active">Grib app</div>
+</div>
+<div class="content">
+  <router-outlet></router-outlet>
+</div>

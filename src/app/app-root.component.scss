@@ -1,0 +1,19 @@
+:host {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 200px 1fr;
+}
+
+.content {
+  padding: 8px;
+}
+
+.menu > div {
+  padding: 8px;
+  cursor: pointer;
+
+  &.active {
+    font-weight: 600;
+    background-color: lightgray;
+  }
+}

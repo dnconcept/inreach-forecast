@@ -1,10 +1,10 @@
-<ol>
-  <li>
+<div>
+  <div>
     Etape 1 : <a target="_blank" href="https://share.garmin.com/share/naos">Ouvrir la carte de Naos :
     https://share.garmin.com/share/naos</a>
     <!--    <button mat-raised-button color="primary" (click)="test()">Test récupération position</button>-->
-  </li>
-  <li>
+  </div>
+  <div>
     Etape 2 : Saisir la position, le cap et la vitesse dans l'application
     <form #ngForm="ngForm">
       <app-input-geoloc placeholder="Latitude" type="lat" required ngModel name="lat"></app-input-geoloc>
@@ -29,9 +29,9 @@
                ngModel name="offsetMiles"> milles
       </div>
     </form>
-  </li>
+  </div>
   <ng-container *ngIf="url1">
-    <li>
+    <div>
       Etape 3 : Saisir les données météos windy
       <div>
         <a href="https://www.windy.com/{{position.lat}}/{{position.lng}}"
@@ -45,13 +45,13 @@
         <thead>
         <tr>
           <th>Point</th>
-          <th>Vent * (kt)</th>
+          <th>Vit. vent (kt)</th>
           <th
             matTooltip="Les rafales sont utilisées pour donner une information du maximum de différence en % sur l'ensemble des points">
             Rafale (kt)
           </th>
-          <th>Direction vent * (°)</th>
-          <th>Hauteur vague * (dm)</th>
+          <th>Dir. vent (°)</th>
+          <th>Hauteur vague (dm)</th>
         </tr>
         </thead>
         <tbody>
@@ -61,61 +61,50 @@
                target="_blank"><img src="https://www.windy.com/favicon.ico" alt="windy"> {{ r.label }}</a>
           </td>
           <td>
-            <input type="number" [(ngModel)]="r.wind" placeholder="en noeuds"> kt
+            <input type="number" [(ngModel)]="r.wind" (ngModelChange)="updateMessage()" placeholder="en noeuds">
           </td>
           <td>
-            <input type="number" [(ngModel)]="r.max_wind" placeholder="en noeuds"> kt
+            <input type="number" [(ngModel)]="r.max_wind" (ngModelChange)="updateMessage()" placeholder="en noeuds">
           </td>
           <td>
-            <input type="number" [(ngModel)]="r.wind_dir" placeholder="en degrés"> °
+            <input type="number" [(ngModel)]="r.wind_dir" (ngModelChange)="updateMessage()" placeholder="en degrés">
           </td>
           <td>
-            <input type="number" [(ngModel)]="r.wave" placeholder="Hauteur vague"> dm
+            <input type="number" [(ngModel)]="r.wave" (ngModelChange)="updateMessage()" placeholder="Hauteur">
           </td>
         </tr>
         </tbody>
       </table>
-      <div>
-        <button mat-raised-button color="primary" (click)="getMessage(ngForm.value)">Passer à l'étape 4</button>
-      </div>
-    </li>
-    <li *ngIf="message">
-      Etape 4 : Envoi du message en répondant au message InReach reçu dans la boîte mail
-      <div>
-        Message formatté : {{ message }}
-      </div>
-      <div>
-        Nombre de caractères météo : {{ message.length }}
-      </div>
-      <textarea [maxlength]="maxChar - message.length"
-                [(ngModel)]="customMsg"
-                placeholder="Message personnalisé : ( {{ maxChar - message.length }} ) max"
-                rows="3"></textarea>
-      <div>
-        Nombre de caractères personnalisés : {{ customMsg.length }}
-      </div>
-      <div>
-        Total caractères : {{ customMsg.length + message.length }}
-      </div>
-      <p><u>Exemple</u> : ESE5A6 F SS07A8 T+24 = Est-SudEst Force 5 à 6 Forcissant Sud Sud Ouest 7 à 8 dans 24 Heures
-      </p>
-      <p>Glossaire pour message raccourci</p>
-      <div>F = Forcissant</div>
-      <div>M = Molissant</div>
-      <div>D = Dépression</div>
-      <div>A = Anticyclone</div>
-      <div>N = Nord</div>
-      <div>S = Sud</div>
-      <div>E = Est</div>
-      <div>W = Ouest</div>
-      <div>MerF = Mer forte</div>
-      <div>MerTF = Mer très forte</div>
-      <div>MerG = Mer grosse</div>
-      <div>
-        <button mat-raised-button color="primary"
-                (click)="copyMessage(message, customMsg)">Copier le message
-        </button>
-      </div>
-    </li>
+    </div>
   </ng-container>
-</ol>
+</div>
+<div>
+  Etape 4 : Envoi du message en répondant au message InReach reçu dans la boîte mail
+  <div>
+    Message formatté : {{ message }}
+  </div>
+  <div>
+    Nombre de caractères météo : {{ message.length }}
+  </div>
+  <textarea [maxlength]="maxChar - message.length"
+            [(ngModel)]="customMsg"
+            placeholder="Message personnalisé : ( {{ maxChar - message.length }} ) max"
+            rows="3"></textarea>
+  <div>
+    Nombre de caractères personnalisés : {{ customMsg.length }}
+  </div>
+  <div>
+    Total caractères : {{ customMsg.length + message.length }}
+  </div>
+  <p><u>Exemple</u> : ESE5A6 F SS07A8 T+24 = Est-SudEst Force 5 à 6 Forcissant Sud Sud Ouest 7 à 8 dans 24 Heures
+  </p>
+  <p>Glossaire pour message raccourci</p>
+  <div class="shortcuts">
+    <div *ngFor="let s of shortCuts"><b>{{s.id}}</b> : {{s.label}}</div>
+  </div>
+  <div>
+    <button mat-raised-button color="primary"
+            (click)="copyMessage(message, customMsg)">Copier le message
+    </button>
+  </div>
+</div>

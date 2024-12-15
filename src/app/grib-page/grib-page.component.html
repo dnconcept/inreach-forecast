@@ -1,0 +1,18 @@
+<div>Sélectionner un fichier GRIB à envoyer</div>
+<input type="file" (change)="setFile($event)">
+
+<div class="grid">
+  <div>
+    <h2>Encodage</h2>
+    <textarea placeholder="Sélectionner le fichier grib à encoder"
+              [(ngModel)]="encodedMessage"></textarea>
+    <ng-container *ngIf="message">
+      <pre>{{ message | json }}</pre>
+    </ng-container>
+  </div>
+
+  <div>
+    <h2>Décodage</h2>
+    <textarea [(ngModel)]="decodedMessage"></textarea>
+  </div>
+</div>

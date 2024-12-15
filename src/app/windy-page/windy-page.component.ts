@@ -29,7 +29,7 @@ interface IFormValue {
 }
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-windy-page',
   imports: [ NgIf, FormsModule, InputGeolocComponent, JsonPipe, MatButton, MatTooltip, NgForOf ],
   templateUrl: './windy-page.component.html',
   styleUrl: './windy-page.component.scss',
@@ -40,12 +40,27 @@ export class WindyPageComponent implements AfterViewInit {
   url1: string;
   position: IPosition;
   newPosition: IPosition;
-  message?: string;
+  message: string = '';
   customMsg = '';
   maxChar = 160;
   errorList: { error: boolean, msg: string }[];
-  resultList: IResult[];
+  resultList: IResult[] = [];
+  formValue: IFormValue;
   @ViewChild(NgForm) ngForm: NgForm;
+
+  shortCuts = [
+    { id: 'F', label: 'Forcissant' },
+    { id: 'M', label: 'Molissant' },
+    { id: 'D', label: 'Dépression' },
+    { id: 'A', label: 'Anticyclone' },
+    { id: 'N', label: 'Nord' },
+    { id: 'S', label: 'Sud' },
+    { id: 'E', label: 'Est' },
+    { id: 'W', label: 'Ouest' },
+    { id: 'MerF', label: 'Mer forte' },
+    { id: 'MerTF', label: 'Mer très forte' },
+    { id: 'MerG', label: 'Mer grosse' },
+  ];
 
   constructor( private http: HttpClient,
                private flash: MatSnackBar,
@@ -88,15 +103,21 @@ export class WindyPageComponent implements AfterViewInit {
       { label: `Point estimé T+${hoursNumber}H`, dir: 'X', lat: pos.lat, lng: pos.lng },
       ...this.getFourPoints(`T+${hoursNumber}H`, pos.lat, pos.lng, offset),
     ];
+    this.formValue = formValue;
+    this.updateMessage();
   }
 
-  getMessage( { speed, cap, hoursNumber }: IFormValue ): void {
-    const msg = this.resultList.map(( {
-                                        dir,
-                                        wind_dir,
-                                        wind, wave
-                                      } ) => `${dir}${wind || ''}k${wind_dir || ''}d${wave || ''}`).join('');
-    const a = this.resultList
+  updateMessage(): void {
+    this.setMessage(this.resultList, this.formValue);
+  }
+
+  setMessage( resultList: IResult[], { speed, cap, hoursNumber }: IFormValue ): void {
+    const msg = resultList.map(( {
+                                   dir,
+                                   wind_dir,
+                                   wind, wave
+                                 } ) => `${dir}${wind || ''}k${wind_dir || ''}d${wave || ''}`).join('');
+    const a = resultList
       .filter(( { wind, max_wind } ) => wind && max_wind)
       .map(( { wind, max_wind } ) => Number(max_wind) / Number(wind));
     const max = a.length ? round((Math.max.apply(null, a) - 1) * 100, 0) : 0;

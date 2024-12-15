@@ -1,6 +1,15 @@
 :host {
-  padding: 16px;
-  display: block;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  font-size: 12px;
+}
+
+.shortcuts {
+  font-size: 10px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 input {
@@ -12,7 +21,7 @@ input {
 }
 
 table input {
-  width: 120px;
+  width: 80px;
 }
 
 .form-group {
