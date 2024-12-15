@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import os
-from app import open_grib
+import tempfile
+from app import open_grib, extract_grib_data
 
 app = Flask(__name__)
 
@@ -21,21 +22,33 @@ def welcome():
 
 @app.route('/process_grib', methods=['POST'])
 def process_grib():
+    return process_grib_request(open_grib)
+
+@app.route('/extract_grib', methods=['POST'])
+def extract_grib():
+    return process_grib_request(extract_grib_data)
+
+def process_grib_request(fn):
     # Vérifier si un fichier a été uploadé
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
 
     file = request.files['file']
-    file_path = os.path.join('/app/data', file.filename)
-    file.save(file_path)
 
-    # file_path = os.path.join('/app/data', "data.grb")
     try:
-        result = open_grib(file_path)
-        response = {
-            'message': result
-        }
-        return jsonify(response)
+        # Save the uploaded file to a temporary location
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".grib") as temp_file:
+            temp_file.write(file.read())
+            temp_file_path = temp_file.name
+
+        # Extract data from the GRIB file
+        grib_data = fn(temp_file_path)
+
+        # Clean up: Remove the temporary file
+        os.remove(temp_file_path)
+
+        # Return the extracted data as JSON
+        return jsonify(grib_data)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

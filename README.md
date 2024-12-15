@@ -38,3 +38,67 @@ ng serve
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+## Solution pour le déploiement
+
+### Railway
+https://railway.app/
+
+Description: Railway is a PaaS that supports deploying Dockerized apps with generous free limits.
+
+Features:
+Free tier includes 500 hours/month and 1 GB of RAM.
+Automatic deployments from GitHub.
+
+Compte créé, repo binder à github 
+
+Testé, fonctionne avec https://nixpacks.com/
+
+### Render
+https://render.com/
+
+Description: Render supports deploying Dockerized applications with a free tier for web services.
+
+Features:
+Free tier includes 512 MB RAM and 0.5 CPU.
+
+https://github.com/render-examples/fastapi/blob/main/render.yaml
+
+### GCloud
+https://console.cloud.google.com/
+
+Description: GCP offers free-tier usage with Cloud Run for containerized apps.
+
+Features:
+Free tier includes 2 million requests/month and 1 vCPU instance.
+Simple deployments with Docker images.
+
+
+
+## API Weather forecast
+
+- https://saildocs.com/
+https://www.saildocs.com/gribmodels
+
+send email to "query@saildocs.com"
+
+GFS:52N,38N,11W,0W|0.5,0.5|0,3,6..48|=
+WIND,PRESS,WAVE
+
+
+- https://open-meteo.com/en/docs/marine-weather-api
+https://open-meteo.com/en/docs/ecmwf-api#hourly=temperature_2m,wind_speed_10m
+https://pypi.org/project/openmeteo-requests/
+
+- https://www.weatherapi.com/
+
+### Map visualization
+
+openstreetmap
+https://leafletjs.com/
+
+https://openlayers.org/
+
+https://docs.mapbox.com/
+
+https://docs.maptiler.com/leaflet/

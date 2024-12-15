@@ -5,4 +5,6 @@ import { GribPageComponent } from './grib-page/grib-page.component';
 export const routes: Routes = [
   { path: 'windy', loadComponent: () => WindyPageComponent },
   { path: 'grib', loadComponent: () => GribPageComponent },
+  { path: '**', redirectTo: 'grib' },
+  { path: '', redirectTo: 'grib', pathMatch: 'full' }
 ];

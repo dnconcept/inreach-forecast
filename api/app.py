@@ -18,6 +18,43 @@ def open_grib( file_path ):
         'encoded': compress_grib(dataV, dataU)
     }
 
+def extract_grib_data(file_like_object):
+    """
+    Extracts metadata and data from a GRIB file using pygrib.
+    Returns a dictionary that can be converted to JSON.
+    """
+    grbs = pygrib.open(file_like_object)
+    data = {}
+    messages = []
+
+    i = 0
+    # Iterate through all messages in the GRIB file
+    for grb in grbs:
+        # Get latitude and longitude grid
+        lats, lons = grb.latlons()
+        if i == 0:
+          data = {
+            "latitudes": lats[:, 0].tolist(),  # Liste unique des latitudes (colonnes fixes)
+            "longitudes": lons[0, :].tolist(),  # Liste unique des longitudes (lignes fixes)
+          }
+        i = i + 1
+        # Extract values and associated geo-information
+        values = grb.values
+        # Add data for this message
+        json_data = {
+            'parameter': grb.parameterName,
+            'short': grb.shortName,
+            'level': grb.level,
+            'units': grb.units,
+            'dataDate': grb.dataDate,
+            'validDate': grb.validDate.isoformat(),
+            "data": values.tolist(),  # Grille des données (valeurs)
+        }
+        messages.append(json_data)
+    data['messages'] = messages
+    grbs.close()
+    return data
+
 def compress_grib(dataV, dataU):
     # retourne l'ordre des lignes du tableau pour que ca commence par les latitudes hautes
     dataV = np.flipud(dataV)

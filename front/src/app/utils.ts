@@ -3,6 +3,14 @@ export interface IPosition {
   lng: number;
 }
 
+export function meanBy<T>( list: T[], field: keyof T ): number {
+  return list.reduce(( acc, x ) => acc + Number(x[ field ]), 0) / list.length;
+}
+
+export function mean( list: number[] ): number {
+  return list.reduce(( acc, x ) => acc + x, 0) / list.length;
+}
+
 export function round( value: number, rounded = 3 ): number {
   const k = Math.pow(10, rounded);
   return Math.round(value * k) / k;
