@@ -1,13 +1,14 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { JsonPipe, NgForOf, NgIf } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { calculateNewPosition, IPosition, round } from './utils';
-import { JsonPipe, NgForOf, NgIf } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { InputGeolocComponent } from './input-geoloc/input-geoloc.component';
 import { MatButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
+
+import { calculateNewPosition, IPosition, round } from '../utils';
+import { InputGeolocComponent } from '../input-geoloc/input-geoloc.component';
 
 interface IResult extends IPosition {
   label: string;
@@ -30,13 +31,12 @@ interface IFormValue {
 @Component({
   selector: 'app-root',
   imports: [ NgIf, FormsModule, InputGeolocComponent, JsonPipe, MatButton, MatTooltip, NgForOf ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  templateUrl: './windy-page.component.html',
+  styleUrl: './windy-page.component.scss',
   standalone: true,
 })
-export class AppComponent implements AfterViewInit {
+export class WindyPageComponent implements AfterViewInit {
 
-  title = 'windy-routing';
   url1: string;
   position: IPosition;
   newPosition: IPosition;
