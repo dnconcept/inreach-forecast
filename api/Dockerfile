@@ -26,6 +26,3 @@ RUN pip install --upgrade pip \
 
 # Expose port if needed (e.g., for a Flask or FastAPI app)
 EXPOSE 8000
-
-# Command to run the app
-CMD ["python", "app.py"]
