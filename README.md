@@ -1,6 +1,33 @@
-# WindyRouting
+# NiCoCo Grib App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.4.
+NiCoCo Grib App permet de compresser un fichier GRIB pour l'envoyer par message via un INREACH, afin d'obtenir une météo en mer de manière efficace.
+
+## Fonctionnement
+
+1. **Serveur exposé sur le web** : L'application fonctionne sur un serveur accessible en ligne.
+2. **Requêtes SMS** : Le client peut interroger le serveur par SMS pour obtenir les prévisions météo sur une zone géographique donnée.
+3. **Réponse optimisée** : Le serveur récupère un fichier GRIB correspondant à la zone demandée, compresse les données et envoie un message encodé de 160 caractères maximum, compatible avec INREACH.
+4. **Décodage et affichage** : Le client utilise une application dédiée pour décoder le message reçu et afficher les données sous forme de carte météo.
+
+## Installation pour développement
+
+### Pré-requis
+
+Installez Docker sur votre machine.
+
+### Étapes
+
+1. **Construire l'image Docker** :
+```bash
+docker build -t coco-grib-app .
+```
+
+2. **Lancer le conteneur** :
+```bash
+docker run -it --rm -p 8000:8000 -v $(pwd)/data:/app/data coco-grib-app
+```
+
+Vous pouvez désormais utiliser l'application en local pour tester et développer les fonctionnalités.
 
 ## Development server
 
@@ -11,49 +38,3 @@ ng serve
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
