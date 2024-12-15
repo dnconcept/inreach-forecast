@@ -1,12 +1,11 @@
 #pygrib est la bibliothèque pour ouvrir un fichier grib
 import pygrib
-import os
 import numpy as np
 
-def open_grib():
-    file_path = os.path.join('/app/data', "data.grb")
+def open_grib( file_path ):
     grbs = pygrib.open(file_path)
-    #dans les grib le vent est décomposé en une composante verticale (V) et une horizontale (U). le [1] indique la première prévision (dans ce cas prévision à 12h).
+    # dans les grib le vent est décomposé en une composante verticale (V) et une horizontale (U).
+    # le [1] indique la première prévision (dans ce cas prévision à 12h).
     grb = grbs.select(name='10 metre V wind component')[1]
     dataV, lats, lons = grb.data()
     grb = grbs.select(name='10 metre U wind component')[1]

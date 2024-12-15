@@ -4,6 +4,13 @@ from app import open_grib
 
 app = Flask(__name__)
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
+
 @app.route('/', methods=['GET'])
 def welcome():
     response = {
@@ -22,8 +29,9 @@ def process_grib():
     file_path = os.path.join('/app/data', file.filename)
     file.save(file_path)
 
+    # file_path = os.path.join('/app/data', "data.grb")
     try:
-        result = open_grib()
+        result = open_grib(file_path)
         response = {
             'message': result
         }
