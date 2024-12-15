@@ -7,7 +7,7 @@
   <span class="lbl">{{placeholder}} en ° minutes</span>
   <input type="number" [ngModel]="deg" (ngModelChange)="setFromDegrees($event)"> °
   <input type="number" [ngModel]="min" (ngModelChange)="setFromMinutes($event)"> '
-  <select [ngModel]="dir">
-    <option *ngFor="let d of directions; let i = index" [value]="i">{{d}}</option>
+  <select [ngModel]="factor" (ngModelChange)="setFromDir($event)">
+    <option *ngFor="let d of directions" [value]="d.factor">{{d.name}}</option>
   </select>
 </div>
