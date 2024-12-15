@@ -2,6 +2,7 @@
   "name": "windy-routing",
   "version": "1.0.0",
   "description": "Front application for weather forecast and routing with INREACH",
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

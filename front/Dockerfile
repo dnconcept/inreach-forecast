@@ -17,11 +17,11 @@ RUN yarn install
 COPY . .
 
 # Build the Angular application
-RUN yarn build --prod
+RUN yarn run build
 
 # Use a lightweight web server to serve the built app
 FROM nginx:alpine
-COPY --from=build /app/dist/windy-routing /usr/share/nginx/html
+COPY --from=build /app/dist/windy-routing/browser /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
