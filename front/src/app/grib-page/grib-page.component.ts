@@ -40,9 +40,6 @@ export class GribPageComponent {
     if (target.files && target.files.length > 0) {
       const file = target.files[ 0 ];
       this.send(file);
-      console.info('[GribPageComponent] setFile', target, target.files);
-    } else {
-      console.warn('[GribPageComponent] No file selected');
     }
   }
 

@@ -74,6 +74,65 @@ Free tier includes 2 million requests/month and 1 vCPU instance.
 Simple deployments with Docker images.
 
 
+Si vous souhaitez déployer plusieurs services (par exemple, une API et un frontend) en utilisant Docker Compose sur Google Cloud Platform (GCP), vous pouvez suivre un processus en deux étapes principales :
+
+Créer des images Docker pour chaque service avec Docker Compose.
+Déployer ces services sur Google Cloud Platform (GCP), notamment en utilisant Google Cloud Run ou Google Kubernetes Engine (GKE).
+Voici comment vous pouvez procéder étape par étape.
+
+1. Créer des images Docker avec Docker Compose
+   Vous allez créer un fichier docker-compose.yml qui définit les services nécessaires à votre application (API backend, frontend, etc.). Ensuite, vous utiliserez Docker Compose pour construire et pousser ces images vers Google Container Registry (GCR).
+
+Le service api est votre backend, qui pourrait être une API Flask ou autre.
+Le service frontend est votre interface utilisateur (par exemple, une application React ou Angular).
+Les services api et frontend sont construits à partir des répertoires locaux ./api et ./frontend, respectivement.
+Vous pouvez remplacer [PROJECT_ID] par l'ID de votre projet GCP pour que les images soient envoyées au bon registre Google Container Registry (GCR).
+
+2. Construire et pousser les images vers Google Container Registry (GCR)
+
+Étape 1 : Authentification avec Google Cloud
+Avant de pousser des images vers GCR, vous devez vous authentifier auprès de Google Cloud. Si vous n'avez pas encore installé le Google Cloud SDK, vous pouvez le télécharger et l'installer depuis Google Cloud SDK.
+
+Ensuite, authentifiez-vous avec la commande :
+
+```bash
+gcloud auth login
+gcloud auth configure-docker
+```
+Cela permet à Docker de pousser les images vers Google Container Registry.
+
+Étape 2 : Construire et taguer les images
+Dans le répertoire où se trouve votre fichier docker-compose.yml, exécutez la commande suivante pour construire les images des services définis dans le fichier :
+
+```bash
+docker-compose -f docker-compose.prod.yml build
+```
+Cela va construire les images pour chaque service (api, frontend, etc.). Une fois les images construites, elles seront disponibles localement.
+
+Étape 3 : Pousser les images vers Google Container Registry
+Ensuite, vous devez pousser les images Docker vers Google Container Registry (GCR). Utilisez la commande docker-compose push pour pousser toutes les images définies dans le fichier docker-compose.yml.
+
+```bash
+docker-compose push
+```
+Cette commande va envoyer les images vers GCR en utilisant les tags définis dans le fichier docker-compose.yml (par exemple, gcr.io/[PROJECT_ID]/api-image).
+
+3. Déployer les services sur Google Cloud Platform (GCP)
+
+Déployer l'API backend : Une fois l'image api-image poussée sur GCR, vous pouvez déployer ce service sur Cloud Run avec la commande suivante :
+
+```bash
+gcloud run deploy inreach-grib-api --image gcr.io/inreach-forecast-444900/inreach-grib-api --platform managed --region europe-west1 --allow-unauthenticated \
+  --set-env-vars FLASK_ENV=production
+```
+
+To list the deployed services in Google Cloud Run
+> gcloud run services list --platform managed
+
+> gcloud run services delete api-service --platform managed
+
+Other resources for gcloud error !
+  https://medium.com/@taylorhughes/how-to-deploy-an-existing-docker-container-project-to-google-cloud-run-with-the-minimum-amount-of-daca0b5978d8
 
 ## API Weather forecast
 

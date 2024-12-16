@@ -1,19 +1,18 @@
 services:
   api:
+    platform: linux/x86_64  # Specify the platform here
     build:
       context: ./api
       dockerfile: Dockerfile
     image: gcr.io/inreach-forecast-444900/inreach-grib-api
     ports:
-      - "8000:8000"
+      - "8080:8080"  # Ensure this is 8080 for Google cloud
     environment:
       - FLASK_APP=api.py
-      - FLASK_ENV=${FLASK_ENV}
-      - FLASK_DEBUG=${FLASK_DEBUG}  # Ensures that the reloader and debugger are enabled
-      - API_URL=${API_URL}
+      - FLASK_ENV=production
     volumes:
       - ./api:/app
-    command: flask run --host=0.0.0.0 --port=8000
+    command: gunicorn --bind 0.0.0.0:8080 api:app  # Use Gunicorn
 
   frontend:
     build:

@@ -40,6 +40,7 @@ def extract_grib_data(file_like_object):
         i = i + 1
         # Extract values and associated geo-information
         values = grb.values
+        # print(grb)
         # Add data for this message
         json_data = {
             'parameter': grb.parameterName,

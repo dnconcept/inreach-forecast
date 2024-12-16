@@ -25,4 +25,8 @@ RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 
 # Expose port if needed (e.g., for a Flask or FastAPI app)
-EXPOSE 8000
+EXPOSE 8080
+
+# This line should exists for GCloud deployment !
+# Start the app using Gunicorn instead of Flask's built-in server
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "api:app"]
