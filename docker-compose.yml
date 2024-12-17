@@ -11,6 +11,9 @@ services:
       - FLASK_ENV=${FLASK_ENV}
       - FLASK_DEBUG=${FLASK_DEBUG}  # Ensures that the reloader and debugger are enabled
       - API_URL=${API_URL}
+      - ECMWF_API_URL
+      - ECMWF_API_KEY
+      - ECMWF_API_EMAIL
     volumes:
       - ./api:/app
     command: flask run --host=0.0.0.0 --port=8000

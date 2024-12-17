@@ -2,3 +2,4 @@ pygrib
 numpy
 flask
 gunicorn
+ecmwf-api-client

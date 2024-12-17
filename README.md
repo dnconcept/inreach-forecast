@@ -134,6 +134,8 @@ To list the deployed services in Google Cloud Run
 Other resources for gcloud error !
   https://medium.com/@taylorhughes/how-to-deploy-an-existing-docker-container-project-to-google-cloud-run-with-the-minimum-amount-of-daca0b5978d8
 
+API Working on ! > https://inreach-grib-api-459273175845.europe-west1.run.app/
+
 ## API Weather forecast
 
 - https://saildocs.com/
@@ -161,3 +163,49 @@ https://openlayers.org/
 https://docs.mapbox.com/
 
 https://docs.maptiler.com/leaflet/
+
+Weacast is an Open Source platform to gather, expose and make use of weather forecast data.
+https://weacast.github.io/
+https://github.com/weacast/weacast
+
+## Weather APIS !
+
+### Meteo France API
+
+Login : n********@gmail.com
+https://portail-api.meteofrance.fr/
+https://public-api.meteofrance.fr/public/arpege/1.0/wcs/MF-NWP-GLOBAL-ARPEGE-025-GLOBE-WCS/GetCoverage?service=WCS&version=2.0.1
+
+https://meteo.data.gouv.fr/hackathon
+
+https://www.figma.com/proto/wytp1BghAtcLdcMKE67OV2/OpenGustMap?type=design&node-id=8-790&t=remvySRlCVyk6oCx-1&scaling=scale-down&page-id=0%3A1&starting-point-node-id=1%3A2
+
+https://portail-api.meteofrance.fr/web/fr/ARPEGE/licence
+
+
+### ecmwf
+
+Login : n********@gmail.com
+https://api.ecmwf.int/v1/key/
+
+Nécessite les variables d'environnements :
+ECMWF_API_URL
+ECMWF_API_KEY
+ECMWF_API_EMAIL
+https://pypi.org/project/ecmwf-api-client/
+
+https://confluence.ecmwf.int/display/ECC/Python+3+interface+for+ecCodes
+
+Librairie cliente python *ecmwf-api-client*
+
+https://pypi.org/project/cfgrib/
+
+TARIFS elevé ! https://confluence.ecmwf.int/display/DAC/Service+Charges%3A+From+01+July+2024
+
+
+### Windy api
+
+https://api.windy.com/keys
+
+
+

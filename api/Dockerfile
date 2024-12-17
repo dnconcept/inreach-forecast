@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     libeccodes-dev \
     python3-dev \
+    bash \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

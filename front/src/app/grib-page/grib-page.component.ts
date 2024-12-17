@@ -26,6 +26,7 @@ interface IMessage {
 export class GribPageComponent {
 
   api = `http://localhost:8000`;
+  // api = `https://inreach-grib-api-459273175845.europe-west1.run.app`;
   message: IMessage;
   center: IPosition;
   grid: IPosition[];
