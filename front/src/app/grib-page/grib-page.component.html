@@ -6,6 +6,7 @@
     <h2>Encodage</h2>
     <textarea placeholder="Sélectionner le fichier grib à encoder"
               [(ngModel)]="encodedMessage"></textarea>
+    <b>{{encodedMessage?.length}}</b>
     <div class="max" *ngIf="message">
       <pre>{{ message | json }}</pre>
     </div>

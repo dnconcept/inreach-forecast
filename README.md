@@ -136,39 +136,31 @@ Other resources for gcloud error !
 
 API Working on ! > https://inreach-grib-api-459273175845.europe-west1.run.app/
 
-## API Weather forecast
+## Weather forecast APIS !
 
+### SAILDOCS ( request GRIB by email )
 - https://saildocs.com/
-https://www.saildocs.com/gribmodels
+- http://www.saildocs.com/gribmodels
+- https://saildocs.com/gribinfo
 
 send email to "query@saildocs.com"
+Example : GFS:52N,38N,11W,0W|0.5,0.5|24,48,72|=WIND,PRESS,WAVE
 
-GFS:52N,38N,11W,0W|0.5,0.5|0,3,6..48|=
-WIND,PRESS,WAVE
+The format for a basic grib-file request is:
+gfs:lat0,lat1,lon0,lon1|dlat,dlon|VTs|Params
 
+"lat0,lat1,lon0,lon1" are the lat-lon limits (whole degrees followed by N/S or E/W)- this field is required, there is no default.
+"dlat,dlon" is the grid-spacing in degrees (e.g. "1,1" for a 1-deg by 1-deg grid), if omitted the default is "2,2". The minimum grid depends on the model, see "available models" below. This parameter has a large effect on file-size, see below.
+"VTs" is a comma-separated list of valid-times (forecast-times, e.g. "24,48,72"), if omitted the default is "24,48,72". Available valid-times depend on the model, see below. Note that forecasts beyond 4 or 5 days should be viewed with increasing skepticism.
+"Params" is a comma-separated list of parameters, default is pressure and wind if omitted.
+
+### OTHERS APIS
 
 - https://open-meteo.com/en/docs/marine-weather-api
-https://open-meteo.com/en/docs/ecmwf-api#hourly=temperature_2m,wind_speed_10m
-https://pypi.org/project/openmeteo-requests/
+- https://open-meteo.com/en/docs/ecmwf-api#hourly=temperature_2m,wind_speed_10m
+- https://pypi.org/project/openmeteo-requests/
 
 - https://www.weatherapi.com/
-
-### Map visualization
-
-openstreetmap
-https://leafletjs.com/
-
-https://openlayers.org/
-
-https://docs.mapbox.com/
-
-https://docs.maptiler.com/leaflet/
-
-Weacast is an Open Source platform to gather, expose and make use of weather forecast data.
-https://weacast.github.io/
-https://github.com/weacast/weacast
-
-## Weather APIS !
 
 ### Meteo France API
 
@@ -208,4 +200,18 @@ TARIFS elevé ! https://confluence.ecmwf.int/display/DAC/Service+Charges%3A+From
 https://api.windy.com/keys
 
 
+## Map visualization
+
+openstreetmap
+https://leafletjs.com/
+
+https://openlayers.org/
+
+https://docs.mapbox.com/
+
+https://docs.maptiler.com/leaflet/
+
+Weacast is an Open Source platform to gather, expose and make use of weather forecast data.
+https://weacast.github.io/
+https://github.com/weacast/weacast
 

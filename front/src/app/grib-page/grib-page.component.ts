@@ -6,9 +6,10 @@ import { GribMapComponent } from './grib-map/grib-map.component';
 import { IPosition, mean } from '../utils';
 
 interface IMessage {
+  /** encoded message to be sent */
   encoded: string;
-  latitudes: number[];
-  longitudes: number[];
+  lats: number[];
+  lngs: number[];
 }
 
 @Component({
@@ -48,22 +49,22 @@ export class GribPageComponent {
     const { api } = this;
     const formData = new FormData();
     formData.append('file', file);
-    this.http.post<IMessage>(`${api}/extract_grib`, formData).subscribe({
+    this.http.post<IMessage>(`${api}/encode_grib`, formData).subscribe({
       next: ( data ) => {
         this.message = data;
         this.center = {
-          lat: mean(data.latitudes),
-          lng: mean(data.longitudes),
+          lat: mean(data.lats),
+          lng: mean(data.lngs),
         }
         const grid = [];
-        for (const lat of data.latitudes) {
-          for (const lng of data.longitudes) {
+        for (const lat of data.lats) {
+          for (const lng of data.lngs) {
             grid.push({ lat, lng });
           }
         }
         this.grid = grid;
         console.info('[GribPageComponent] next ', this.center, data);
-        // this.encodedMessage = data.encoded;
+        this.encodedMessage = data.encoded;
       },
       error: ( error ) => console.error('[GribPageComponent] Error sending file', error),
     });

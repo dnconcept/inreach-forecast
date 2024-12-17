@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 import tempfile
-from app import open_grib, extract_grib_data
+from app import encode_grib_file, extract_grib_file
 
 app = Flask(__name__)
 
@@ -20,13 +20,13 @@ def welcome():
     }
     return jsonify(response)
 
-@app.route('/process_grib', methods=['POST'])
-def process_grib():
-    return process_grib_request(open_grib)
+@app.route('/encode_grib', methods=['POST'])
+def encode_grib():
+    return process_grib_request(encode_grib_file)
 
 @app.route('/extract_grib', methods=['POST'])
 def extract_grib():
-    return process_grib_request(extract_grib_data)
+    return process_grib_request(extract_grib_file)
 
 def process_grib_request(fn):
     # Vérifier si un fichier a été uploadé
