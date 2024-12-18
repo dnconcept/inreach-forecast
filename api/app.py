@@ -16,11 +16,12 @@ def encode_grib_file( file_path ):
     grb = grbs.select(name='10 metre U wind component')[1]
     dataU, lats, lngs = grb.data()
     grbs.close()
+    grid_size = 6
 
-    ru = reduce_matrix(dataU)
-    rv = reduce_matrix(dataV)
-    rlats = reduce_matrix(lats)
-    rlngs = reduce_matrix(lngs)
+    ru = reduce_matrix(dataU, grid_size)
+    rv = reduce_matrix(dataV, grid_size)
+    rlats = reduce_matrix(lats, grid_size)
+    rlngs = reduce_matrix(lngs, grid_size)
 
     u, v, e = encode_data(ru, rv)
 
@@ -32,7 +33,7 @@ def encode_grib_file( file_path ):
         'v': v.tolist(),
     }
 
-def reduce_matrix(matrix, max_size=6):
+def reduce_matrix(matrix, max_size):
     """
     Réduit une matrice à une taille maximale donnée tout en conservant
     les valeurs des extrémités et en échantillonnant les valeurs intermédiaires.

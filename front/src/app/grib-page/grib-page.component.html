@@ -1,21 +1,53 @@
-<div>Sélectionner un fichier GRIB à envoyer</div>
-<input type="file" (change)="setFile($event)">
+<div class="row">
+  <mat-tab-group>
+    <mat-tab label="Requête">
+      <app-input-geoloc type="lat"
+                        [ngModel]="lat" placeholder="latitude"></app-input-geoloc>
+      <app-input-geoloc type="lng"
+                        [(ngModel)]="lng" placeholder="longitude"></app-input-geoloc>
+      <div>
+        <span>Décalage grille</span>
+        <input type="number" [(ngModel)]="offset">
+      </div>
 
-<div class="grid">
-  <div>
-    <h2>Encodage</h2>
-    <textarea placeholder="Sélectionner le fichier grib à encoder"
-              [(ngModel)]="encodedMessage"></textarea>
-    <b>{{encodedMessage?.length}}</b>
-    <div class="max" *ngIf="message">
-      <pre>{{ message | json }}</pre>
-    </div>
-  </div>
-
-  <div>
-    <h2>Décodage</h2>
-    <textarea [(ngModel)]="decodedMessage"></textarea>
-  </div>
+      <button mat-stroked-button color="primary"
+              (click)="requestGrib(lat, lng, offset)">Demander un fichier GRIB
+      </button>
+      <div *ngIf="gribResponse">
+        <div>Requête GRIB</div>
+        <div><b>Request</b> : {{ gribResponse.grib_request }}</div>
+        <div><b>Subject</b> : {{ gribResponse.grib_subject }}</div>
+        <div><b>Message</b> : {{ gribResponse.message }}</div>
+        <div><b>Center</b> : {{ gribResponse.center | json }}</div>
+      </div>
+      <button mat-stroked-button color="primary" [disabled]="!gribResponse?.grib_subject"
+              (click)="checkGrib(gribResponse?.grib_subject!)">Vérifier les fichiers GRIB
+      </button>
+    </mat-tab>
+    <mat-tab label="Encodage">
+      <div>Sélectionne un fichier GRIB à envoyer en mer !</div>
+      <input type="file" (change)="setFile($event)">
+      <button mat-stroked-button color="primary" [disabled]="!file"
+              (click)="encodeGrib(file)">Encoder
+      </button>
+      <ng-container [ngTemplateOutlet]="encodedTpl"></ng-container>
+    </mat-tab>
+    <mat-tab label="Décodage">
+      <ng-container [ngTemplateOutlet]="encodedTpl"></ng-container>
+      <button mat-stroked-button color="primary" (click)="decode(encodedMessage)">Décoder</button>
+      <pre>{{ decodedData | json }}</pre>
+    </mat-tab>
+  </mat-tab-group>
 </div>
 
-<app-grib-map [center]="center" [grid]="grid" *ngIf="message"></app-grib-map>
+<ng-template #encodedTpl>
+  <textarea placeholder="Message encodé" disabled
+            [(ngModel)]="encodedMessage"></textarea>
+  <div class="txt__right"><i>{{ encodedMessage?.length }} caractères</i></div>
+</ng-template>
+
+<app-grib-map
+  [center]="center"
+  [grid]="grid"
+  (mapClicked)="setLatLng($event)"
+></app-grib-map>

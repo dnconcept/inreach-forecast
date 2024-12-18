@@ -14,6 +14,8 @@ services:
       - ECMWF_API_URL
       - ECMWF_API_KEY
       - ECMWF_API_EMAIL
+      - GMAIL_APP_MAIL
+      - GMAIL_APP_PASS
     volumes:
       - ./api:/app
     command: flask run --host=0.0.0.0 --port=8000

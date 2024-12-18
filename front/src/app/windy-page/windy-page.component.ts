@@ -3,30 +3,13 @@ import { JsonPipe, NgForOf, NgIf } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 
 import { calculateNewPosition, IPosition, round } from '../utils';
 import { InputGeolocComponent } from '../input-geoloc/input-geoloc.component';
-
-interface IResult extends IPosition {
-  label: string;
-  dir: string;
-  wind_dir?: number;
-  wind?: number;
-  max_wind?: number;
-  wave?: number;
-}
-
-interface IFormValue {
-  lat: number,
-  lng: number,
-  cap: number,
-  speed: number,
-  hoursNumber: number,
-  offsetMiles: number,
-}
+import { DialogService } from '@app.services';
+import { IFormValue, IResult } from '@app.interfaces';
 
 @Component({
   selector: 'app-windy-page',
@@ -63,7 +46,7 @@ export class WindyPageComponent implements AfterViewInit {
   ];
 
   constructor( private http: HttpClient,
-               private flash: MatSnackBar,
+               private dialogService: DialogService,
                private clipboard: Clipboard ) {
   }
 
@@ -128,9 +111,9 @@ export class WindyPageComponent implements AfterViewInit {
   copyMessage( msg1: string, msg2: string ): void {
     const finalMsg = msg1 + msg2;
     this.clipboard.copy(finalMsg);
-    this.flash.open(`Le message a été copié !`, 'info');
+    this.dialogService.flashInfo(`Le message a été copié !`);
     if (finalMsg.length > 160) {
-      this.flash.open(`Attention le message fait plus de 160 caractères !`, 'warn');
+      this.dialogService.flashWarn(`Attention le message fait plus de 160 caractères !`);
     }
   }
 

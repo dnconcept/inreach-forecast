@@ -33,7 +33,7 @@ const DIRECTIONS: IDir[] = [
 })
 export class InputGeolocComponent extends AppInputBase implements OnInit {
   @Input() type?: 'lat' | 'lng';
-  asCoord = true;
+  asCoordinate = true;
   deg: number;
   min: number;
   factor: -1 | 1 = 1;
@@ -45,10 +45,13 @@ export class InputGeolocComponent extends AppInputBase implements OnInit {
 
   protected override onWriteValue( value: number ): void {
     this.factor = value > 0 ? 1 : -1;
-    const ints = Math.trunc(value);
-    this.deg = Math.abs(ints);
+    const intVal = Math.trunc(value);
+    if (isNaN(intVal)) {
+      return;
+    }
+    this.deg = Math.abs(intVal);
     const decimals = 2; // countDecimal(value);
-    this.min = Math.abs(round((value - ints) * 0.60, decimals) * Math.pow(10, decimals));
+    this.min = Math.abs(round((value - intVal) * 0.60, decimals) * Math.pow(10, decimals));
   }
 
   setValue( v: number ): void {
